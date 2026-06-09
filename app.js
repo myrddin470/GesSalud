@@ -371,7 +371,7 @@ document.getElementById('btn-trends').onclick = async () => {
         localStorage.setItem('health_current_year', currentDate.getFullYear());
         localStorage.setItem('health_current_month', currentDate.getMonth());
 
-        window.open('trends.html', '_blank');
+        window.location.href = 'trends.html';
 
     } catch (err) {
         alert("Error al recopilar el histórico para las tendencias.");
