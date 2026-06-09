@@ -17,6 +17,8 @@
     --color-danger: #ef4444;
     --color-success: #10b981;
     --color-warning: #f97316;    /* Color naranja para desajustes de glucosa */
+
+    --color-weight: #2563eb;
     
     --day-laborable: #ffffff;
     --day-festivo: #fff1f2;     
@@ -254,7 +256,7 @@ body {
     display: inline-block;
 }
 
-.dot-weight { background-color: var(--color-danger); }
+.dot-weight { background-color: var(--color-weight); }
 .dot-glucose { background-color: var(--color-success); }
 .dot-glucose-alert { background-color: var(--color-warning); }
 
