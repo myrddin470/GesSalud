@@ -220,6 +220,7 @@ function openModal(day, data, isSunday) {
     dayModal.classList.remove('hidden');
 }
 
+
 document.getElementById('btn-save').onclick = async () => {
     if (!selectedDateStr || !currentUser) return;
     
