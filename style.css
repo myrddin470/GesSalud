@@ -41,6 +41,7 @@ body {
     background-color: var(--bg-workspace);
     color: var(--text-primary);
     height: 100vh;
+    height: 100dvh; /* Evita desajustes por la barra dinámica de navegación móvil */
     overflow: hidden;
     letter-spacing: -0.01em;
 }
@@ -55,6 +56,7 @@ body {
     align-items: center;
     justify-content: center;
     height: 100vh;
+    height: 100dvh;
     background: radial-gradient(circle at top right, #eef2ff, var(--bg-workspace));
 }
 
@@ -110,6 +112,7 @@ body {
     display: flex;
     flex-direction: column;
     height: 100vh;
+    height: 100dvh; /* Altura dinámica controlada en toda la app layout */
 }
 
 .topbar {
@@ -146,6 +149,7 @@ body {
     flex-direction: column;
     padding: 1.5rem 2rem;
     overflow: hidden;
+    min-height: 0; /* Permite que decrezca de forma segura y no empuje el footer */
 }
 
 .calendar-control-panel {
@@ -170,6 +174,7 @@ body {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    min-height: 0; /* Asegura el colapso controlado de la cuadrícula interna */
 }
 
 .weekdays-header {
@@ -313,20 +318,6 @@ body {
     color: var(--text-secondary);
 }
 
-/* Ajustes responsive de la barra inferior */
-@media (max-width: 1200px) {
-    .bottom-bar {
-        flex-direction: column;
-        gap: 1rem;
-        padding: 1rem;
-    }
-    .footer-legend {
-        width: 100%;
-        justify-content: center;
-        flex-wrap: wrap;
-    }
-}
-
 /* =========================================
    DESTACADO PARA EL DÍA ACTUAL (HOY)
    ========================================= */
@@ -466,22 +457,6 @@ button, .custom-file-upload {
 .btn-action-delete { background: transparent; color: var(--color-danger); border: 1px solid #fecaca; }
 .btn-action-delete:hover { background: #fee2e2; }
 
-/* RESPONSIVE */
-@media (max-width: 1024px) {
-    .bottom-bar { flex-direction: column; gap: 1rem; padding: 1rem; }
-    .footer-actions { width: 100%; justify-content: space-between; }
-    .footer-actions span { display: none; }
-    .divider-v { display: none; }
-}
-
-@media (max-width: 768px) {
-    .weekdays-header { font-size: 0.65rem; }
-    .modern-grid { gap: 4px; }
-    .day-cell { padding: 0.4rem; border-radius: 8px; }
-    .day-number { font-size: 0.9rem; }
-    .dot { width: 6px; height: 6px; }
-}
-
 .btn-icon {
     padding: 0.625rem;
     border: 1px solid #cbd5e1;
@@ -492,7 +467,7 @@ button, .custom-file-upload {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    height: 42px; /* Alineación vertical perfecta con los selectores */
+    height: 42px; 
     width: 42px;
     transition: all 0.2s ease;
 }
@@ -506,4 +481,26 @@ button, .custom-file-upload {
 
 .btn-icon:active {
     transform: translateY(0);
+}
+
+/* RESPONSIVE & ADAPTACIÓN MÓVIL CRÍTICA */
+@media (max-width: 1024px) {
+    .bottom-bar { flex-direction: column; gap: 1rem; padding: 1rem; }
+    .footer-actions { width: 100%; justify-content: space-between; }
+    .footer-actions span { display: none; }
+    .divider-v { display: none; }
+}
+
+@media (max-width: 768px) {
+    .weekdays-header { font-size: 0.65rem; }
+    .modern-grid { gap: 4px; }
+    .day-cell { padding: 0.4rem; border-radius: 8px; }
+    .day-number { font-size: 0.9rem; }
+    .dot { width: 6px; height: 6px; }
+    
+    /* Corrección de empaquetado de márgenes en pantallas muy cortas */
+    .calendar-wrapper { padding: 0.75rem 1rem; }
+    .bottom-bar { gap: 0.6rem; padding: 0.75rem 1rem; }
+    .footer-legend { gap: 0.6rem; padding: 0.4rem 0.75rem; margin: 0 auto; width: auto; justify-content: center; }
+    .footer-actions { margin-top: 0.25rem; width: 100%; justify-content: center; }
 }
