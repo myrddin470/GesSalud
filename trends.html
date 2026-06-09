@@ -401,30 +401,45 @@
             container.innerHTML = `<canvas id="chartPeso"></canvas>`;
             const ctx = document.getElementById('chartPeso').getContext('2d');
             
+            // Filtrado estricto para extraer solo valores numéricos reales (evitando nulls de días vacíos)
+            const vValores = data.filter(v => v !== null && v !== undefined && !isNaN(v));
+            let minCalculated = undefined;
+            let maxCalculated = undefined;
+
+            if (vValores.length > 0) {
+                // Margen de 5 kg por arriba y por abajo para amortiguar visualmente los picos
+                minCalculated = Math.floor(Math.min(...vValores) - 5);
+                maxCalculated = Math.ceil(Math.max(...vValores) + 5);
+            }
+
             chartPesoInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
-                    // BUSCA ESTE BLOQUE CORRESPONDIENTE AL PESO Y CAMBIA LOS TRES VALORES EN ROJO POR ESTOS:
-datasets: [{
-    label: 'Peso (kg)',
-    data: data,
-    borderColor: '#2563eb',                    /* CAMBIADO A AZUL */
-    backgroundColor: 'rgba(37, 99, 235, 0.04)', /* CAMBIADO A AZUL TRANSPARENTE */
-    borderWidth: 2.5,
-    tension: 0.2,
-    spanGaps: true,
-    pointBackgroundColor: '#2563eb',           /* CAMBIADO A AZUL */
-    pointRadius: pointRadius,
-    fill: true
-}]
+                    datasets: [{
+                        label: 'Peso (kg)',
+                        data: data,
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.04)',
+                        borderWidth: 2.5,
+                        tension: 0.2,
+                        spanGaps: true,
+                        pointBackgroundColor: '#2563eb',
+                        pointRadius: pointRadius,
+                        fill: true
+                    }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: {
-                        y: { ticks: { font: { family: 'Plus Jakarta Sans' } }, grid: { color: '#f1f5f9' } },
+                        y: { 
+                            min: minCalculated,
+                            max: maxCalculated,
+                            ticks: { font: { family: 'Plus Jakarta Sans' } }, 
+                            grid: { color: '#f1f5f9' } 
+                        },
                         x: { 
                             ticks: { 
                                 font: { family: 'Plus Jakarta Sans', size: 9 },
@@ -449,6 +464,20 @@ datasets: [{
             container.innerHTML = `<canvas id="chartGlucosa"></canvas>`;
             const ctx = document.getElementById('chartGlucosa').getContext('2d');
             
+            // Filtrado estricto para extraer solo valores numéricos reales de glucosa
+            const vValores = data.filter(v => v !== null && v !== undefined && !isNaN(v));
+            let minCalculated = undefined;
+            let maxCalculated = undefined;
+
+            if (vValores.length > 0) {
+                // Margen de 20 mg/dL por arriba y por abajo para equilibrar la curva
+                minCalculated = Math.floor(Math.min(...vValores) - 20);
+                maxCalculated = Math.ceil(Math.max(...vValores) + 20);
+                
+                // Evitamos que el límite inferior baje de 0 en el eje de coordenadas
+                if (minCalculated < 0) minCalculated = 0;
+            }
+
             chartGlucosaInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -472,10 +501,10 @@ datasets: [{
                     plugins: { legend: { display: false } },
                     scales: {
                         y: {
+                            min: minCalculated,
+                            max: maxCalculated,
                             ticks: { font: { family: 'Plus Jakarta Sans' } },
-                            grid: { color: '#f1f5f9' },
-                            suggestedMin: 70,
-                            suggestedMax: 100
+                            grid: { color: '#f1f5f9' }
                         },
                         x: {
                             ticks: { 
@@ -489,6 +518,6 @@ datasets: [{
                 }
             });
         }
-    </script>
+</script>
 </body>
 </html>
