@@ -38,13 +38,13 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
 auth.onAuthStateChanged((user) => {
     if (user) {
         currentUser = user;
-        loginContainer.classList.add('hidden');
-        appContainer.classList.remove('hidden');
+        loginContainer.classList.add('hidden');    // Como ya nace con 'hidden', aquí no parpadea nada
+        appContainer.classList.remove('hidden');   // Muestra el calendario directamente
         setupControlListeners(); 
         loadMonthDataAndRender();
     } else {
         currentUser = null;
-        loginContainer.classList.remove('hidden');
+        loginContainer.classList.remove('hidden'); // Si no estás logueado, le quita el 'hidden' y aparece
         appContainer.classList.add('hidden');
     }
 });
