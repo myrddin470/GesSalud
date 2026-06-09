@@ -9,6 +9,15 @@ const firebaseConfig = {
     appId: "1:281755906517:web:cacdc5fa1987e9a861cd5c"
 };
 
+window.addEventListener('pageshow', () => {
+    window.scrollTo(0, 0);
+    document.body.scrollTop = 0;
+    if (document.documentElement) {
+        document.documentElement.scrollTop = 0;
+    }
+});
+
+
 // Inicialización de Servicios (Corregido: Añadido initializeApp)
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
