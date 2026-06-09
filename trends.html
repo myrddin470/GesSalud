@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis de Tendencias e Historial | ©JCOS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --brand-color: #4f46e5;
+            --brand-hover: #4338ca;
+            --bg-workspace: #f8fafc;
+            --bg-card: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --border-subtle: #f1f5f9;
+            --color-danger: #ef4444;
+            --color-success: #10b981;
+            --color-warning: #f97316;
+            --radius-box: 12px;
+            --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-workspace);
+            color: var(--text-primary);
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            background: var(--bg-card);
+            padding: 1.5rem 2rem;
+            border-radius: var(--radius-box);
+            box-shadow: var(--shadow-card);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .brand-title h1 { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); }
+        .brand-title p { font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.25rem; }
+
+        .controls { display: flex; gap: 0.75rem; align-items: center; }
+        
+        select {
+            padding: 0.625rem 1rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-family: inherit;
+            font-weight: 600;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            cursor: pointer;
+            outline: none;
+        }
+        select:focus { border-color: var(--brand-color); }
+        
+        #period-select {
+            background-color: #eef2ff;
+            border-color: #c7d2fe;
+            color: var(--brand-color);
+        }
+
+        /* DISEÑO DE TARJETAS DE PROMEDIOS */
+        .grid-summary {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .summary-card {
+            background: var(--bg-card);
+            padding: 1.25rem 1.5rem;
+            border-radius: var(--radius-box);
+            box-shadow: var(--shadow-card);
+            border: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .summary-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.35rem;
+        }
+
+        .summary-info h3 {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .summary-info p {
+            font-size: 1.65rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-top: 0.15rem;
+        }
+
+        .grid-charts {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 968px) {
+            header { flex-direction: column; gap: 1.5rem; align-items: flex-start; }
+            .controls { width: 100%; flex-wrap: wrap; }
+            .controls select { flex: 1; min-width: 130px; }
+            .grid-summary, .grid-charts { grid-template-columns: 1fr; }
+        }
+
+        .chart-card {
+            background: var(--bg-card);
+            padding: 1.5rem;
+            border-radius: var(--radius-box);
+            box-shadow: var(--shadow-card);
+            border: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chart-card h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .chart-container {
+            position: relative;
+            flex: 1;
+            width: 100%;
+            min-height: 360px;
+        }
+
+        .no-data-alert {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 360px;
+            color: var(--text-secondary);
+            font-style: italic;
+            gap: 0.75rem;
+        }
+        .no-data-alert i { font-size: 2rem; color: #cbd5e1; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <div class="brand-title">
+                <h1><i class="fas fa-chart-line" style="color: var(--brand-color); margin-right: 0.5rem;"></i>Análisis de Tendencias</h1>
+                <p>Histórico analítico de mediciones metabólicas de salud</p>
+            </div>
+            <div class="controls">
+                <select id="period-select">
+                    <option value="1">Mes individual</option>
+                    <option value="3">Últimos 3 meses</option>
+                    <option value="6">Últimos 6 meses</option>
+                </select>
+                <select id="month-select"></select>
+                <select id="year-select"></select>
+            </div>
+        </header>
+
+        <!-- SECCIÓN DE TARJETAS DE MÉTRICAS MEDIAS -->
+        <div class="grid-summary">
+            <div class="summary-card">
+                <div class="summary-icon" style="color: var(--color-danger); background: rgba(239, 68, 68, 0.08);">
+                    <i class="fas fa-weight-scale"></i>
+                </div>
+                <div class="summary-info">
+                    <h3>Peso Medio Promedio</h3>
+                    <p id="kpi-peso-medio">—</p>
+                </div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-icon" style="color: var(--color-success); background: rgba(16, 185, 129, 0.08);">
+                    <i class="fas fa-droplet"></i>
+                </div>
+                <div class="summary-info">
+                    <h3>Glucosa Media Promedio</h3>
+                    <p id="kpi-glucosa-media">—</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-charts">
+            <!-- GRÁFICA DE PESO -->
+            <div class="chart-card">
+                <h2><i class="fas fa-weight-scale" style="color: var(--color-danger);"></i> Evolución del Peso Corporal</h2>
+                <div class="chart-container" id="container-peso">
+                    <canvas id="chartPeso"></canvas>
+                </div>
+            </div>
+
+            <!-- GRÁFICA DE GLUCOSA -->
+            <div class="chart-card">
+                <h2><i class="fas fa-droplet" style="color: var(--color-success);"></i> Historial de Glucosa (mg/dL)</h2>
+                <div class="chart-container" id="container-glucosa">
+                    <canvas id="chartGlucosa"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Librería Chart.js mediante CDN estable -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script>
+        const rawHistory = JSON.parse(localStorage.getItem('health_history_data')) || {};
+        let selectedYear = localStorage.getItem('health_current_year') || new Date().getFullYear();
+        let selectedMonth = localStorage.getItem('health_current_month') || new Date().getMonth();
+
+        const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+        
+        let chartPesoInstance = null;
+        let chartGlucosaInstance = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initSelectors();
+            processAndRenderCharts();
+        });
+
+        function initSelectors() {
+            const pSelect = document.getElementById('period-select');
+            const mSelect = document.getElementById('month-select');
+            const ySelect = document.getElementById('year-select');
+
+            mSelect.innerHTML = monthNames.map((m, i) => `<option value="${i}">${m}</option>`).join('');
+            mSelect.value = selectedMonth;
+
+            let distinctYears = new Set([parseInt(selectedYear), new Date().getFullYear()]);
+            Object.keys(rawHistory).forEach(key => {
+                const parts = key.split('-');
+                if(parts[0]) distinctYears.add(parseInt(parts[0]));
+            });
+            
+            Array.from(distinctYears).sort().forEach(yr => {
+                const opt = document.createElement('option');
+                opt.value = yr; opt.textContent = yr;
+                ySelect.appendChild(opt);
+            });
+            ySelect.value = selectedYear;
+
+            pSelect.onchange = () => processAndRenderCharts();
+            mSelect.onchange = (e) => { selectedMonth = e.target.value; processAndRenderCharts(); };
+            ySelect.onchange = (e) => { selectedYear = e.target.value; processAndRenderCharts(); };
+        }
+
+        function processAndRenderCharts() {
+            const periodMonths = parseInt(document.getElementById('period-select').value);
+            
+            let labels = [];
+            let datasetPeso = [];
+            let datasetGlucosa = [];
+            
+            // Acumuladores analíticos para los promedios numéricos
+            let sumPeso = 0, countPeso = 0;
+            let sumGlucosa = 0, countGlucosa = 0;
+
+            for (let i = periodMonths - 1; i >= 0; i--) {
+                let iterDate = new Date(parseInt(selectedYear), parseInt(selectedMonth) - i, 1);
+                let y = iterDate.getFullYear();
+                let mNum = iterDate.getMonth();
+                let mStr = String(mNum + 1).padStart(2, '0');
+                
+                let key = `${y}-${mStr}`;
+                let daysInMonth = new Date(y, mNum + 1, 0).getDate();
+                let monthData = rawHistory[key] || {};
+                
+                for (let d = 1; d <= daysInMonth; d++) {
+                    let dayStr = String(d).padStart(2, '0');
+                    
+                    if (periodMonths === 1) {
+                        labels.push(`Día ${dayStr}`);
+                    } else {
+                        labels.push(`${dayStr}/${mStr}`);
+                    }
+                    
+                    if (monthData[dayStr]) {
+                        const pesoVal = monthData[dayStr].peso !== undefined && monthData[dayStr].peso !== null ? parseFloat(monthData[dayStr].peso) : null;
+                        const glucosaVal = monthData[dayStr].glucosa !== undefined && monthData[dayStr].glucosa !== null ? parseInt(monthData[dayStr].glucosa) : null;
+                        
+                        datasetPeso.push(pesoVal);
+                        datasetGlucosa.push(glucosaVal);
+                        
+                        // Computar si el valor es válido y numérico
+                        if (pesoVal !== null && !isNaN(pesoVal)) {
+                            sumPeso += pesoVal;
+                            countPeso++;
+                        }
+                        if (glucosaVal !== null && !isNaN(glucosaVal)) {
+                            sumGlucosa += glucosaVal;
+                            countGlucosa++;
+                        }
+                    } else {
+                        datasetPeso.push(null);
+                        datasetGlucosa.push(null);
+                    }
+                }
+            }
+
+            // Actualizar Tarjetas de Información Dinámica (KPIs)
+            const kpiPeso = document.getElementById('kpi-peso-medio');
+            const kpiGlucosa = document.getElementById('kpi-glucosa-media');
+
+            if (countPeso > 0) {
+                kpiPeso.textContent = `${(sumPeso / countPeso).toFixed(2)} kg`;
+            } else {
+                kpiPeso.textContent = '—';
+            }
+
+            if (countGlucosa > 0) {
+                kpiGlucosa.textContent = `${Math.round(sumGlucosa / countGlucosa)} mg/dL`;
+            } else {
+                kpiGlucosa.textContent = '—';
+            }
+
+            const pointRadiusSize = periodMonths === 1 ? 4 : (periodMonths === 3 ? 2 : 1);
+
+            renderPesoChart(labels, datasetPeso, countPeso > 0, pointRadiusSize);
+            renderGlucosaChart(labels, datasetGlucosa, countGlucosa > 0, pointRadiusSize);
+        }
+
+        function renderPesoChart(labels, data, hasData, pointRadius) {
+            const container = document.getElementById('container-peso');
+            if (!hasData) {
+                container.innerHTML = `<div class="no-data-alert"><i class="fas fa-folder-open"></i>No hay registros de peso en el intervalo seleccionado.</div>`;
+                chartPesoInstance = null;
+                return;
+            }
+
+            container.innerHTML = `<canvas id="chartPeso"></canvas>`;
+            const ctx = document.getElementById('chartPeso').getContext('2d');
+            
+            chartPesoInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Peso (kg)',
+                        data: data,
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.04)',
+                        borderWidth: 2.5,
+                        tension: 0.2,
+                        spanGaps: true,
+                        pointBackgroundColor: '#ef4444',
+                        pointRadius: pointRadius,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { ticks: { font: { family: 'Plus Jakarta Sans' } }, grid: { color: '#f1f5f9' } },
+                        x: { 
+                            ticks: { 
+                                font: { family: 'Plus Jakarta Sans', size: 9 },
+                                autoSkip: true,
+                                maxTicksLimit: 20
+                            }, 
+                            grid: { display: false } 
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderGlucosaChart(labels, data, hasData, pointRadius) {
+            const container = document.getElementById('container-glucosa');
+            if (!hasData) {
+                container.innerHTML = `<div class="no-data-alert"><i class="fas fa-folder-open"></i>No hay registros de glucosa en el intervalo seleccionado.</div>`;
+                chartGlucosaInstance = null;
+                return;
+            }
+
+            container.innerHTML = `<canvas id="chartGlucosa"></canvas>`;
+            const ctx = document.getElementById('chartGlucosa').getContext('2d');
+            
+            chartGlucosaInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Glucosa (mg/dL)',
+                        data: data,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.04)',
+                        borderWidth: 2.5,
+                        tension: 0.15,
+                        spanGaps: true,
+                        pointBackgroundColor: '#10b981',
+                        pointRadius: pointRadius,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            ticks: { font: { family: 'Plus Jakarta Sans' } },
+                            grid: { color: '#f1f5f9' },
+                            suggestedMin: 70,
+                            suggestedMax: 100
+                        },
+                        x: {
+                            ticks: { 
+                                font: { family: 'Plus Jakarta Sans', size: 9 },
+                                autoSkip: true,
+                                maxTicksLimit: 20
+                            },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
