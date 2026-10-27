@@ -18,6 +18,7 @@
             --color-danger: #ef4444;
             --color-success: #10b981;
             --color-warning: #f97316;
+            --color-bp: #8b5cf6;
             --radius-box: 12px;
             --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
         }
@@ -72,10 +73,10 @@
             color: var(--brand-color);
         }
 
-        /* DISEÑO DE TARJETAS DE PROMEDIOS */
+        /* 3 TARJETAS DE PROMEDIOS */
         .grid-summary {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 1.5rem;
             margin-bottom: 1.5rem;
         }
@@ -110,7 +111,7 @@
         }
 
         .summary-info p {
-            font-size: 1.65rem;
+            font-size: 1.5rem;
             font-weight: 700;
             color: var(--text-primary);
             margin-top: 0.15rem;
@@ -122,11 +123,16 @@
             gap: 1.5rem;
         }
 
+        .chart-card.full-width {
+            grid-column: 1 / -1;
+        }
+
         @media (max-width: 968px) {
             header { flex-direction: column; gap: 1.5rem; align-items: flex-start; }
             .controls { width: 100%; flex-wrap: wrap; }
             .controls select { flex: 1; min-width: 130px; }
             .grid-summary, .grid-charts { grid-template-columns: 1fr; }
+            .chart-card.full-width { grid-column: auto; }
         }
 
         .chart-card {
@@ -152,7 +158,7 @@
             position: relative;
             flex: 1;
             width: 100%;
-            min-height: 360px;
+            min-height: 340px;
         }
 
         .no-data-alert {
@@ -160,41 +166,34 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 360px;
+            height: 340px;
             color: var(--text-secondary);
             font-style: italic;
             gap: 0.75rem;
         }
         .no-data-alert i { font-size: 2rem; color: #cbd5e1; }
    
-   /* NUEVO: Estilo para el botón de regresar */
-.btn-icon {
-    padding: 0.625rem;
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
-    background: var(--bg-card);
-    color: var(--text-secondary);
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 42px; /* Misma altura que los selectores para alineación perfecta */
-    width: 42px;
-    transition: all 0.2s ease;
-}
+        .btn-icon {
+            padding: 0.625rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 42px;
+            width: 42px;
+            transition: all 0.2s ease;
+        }
 
-.btn-icon:hover {
-    color: var(--brand-color);
-    border-color: #c7d2fe;
-    background: #eef2ff;
-    transform: translateY(-1px);
-}
-
-.btn-icon:active {
-    transform: translateY(0);
-}
-   
-   
+        .btn-icon:hover {
+            color: var(--brand-color);
+            border-color: #c7d2fe;
+            background: #eef2ff;
+            transform: translateY(-1px);
+        }
    </style>
 </head>
 <body>
@@ -206,60 +205,62 @@
                 <p>Histórico analítico de mediciones metabólicas de salud</p>
             </div>
         
-<!-- BUSCA LA CAJA DE CONTROLES Y DÉJALA ASÍ: -->
-<div class="controls">
-    <!-- NUEVO: Botón de flecha para volver al index.html -->
-    <a href="index.html" class="btn-icon" title="Volver al Calendario" style="text-decoration: none;">
-        <i class="fas fa-arrow-left"></i>
-    </a>
+            <div class="controls">
+                <a href="index.html" class="btn-icon" title="Volver al Calendario" style="text-decoration: none;">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
 
-    <select id="period-select">
-        <option value="1">Mes </option>
-        <option value="3">Últimos 3 meses</option>
-        <option value="6">Últimos 6 meses</option>
-    </select>
-    <select id="month-select"></select>
-    <select id="year-select"></select>
-</div>
-
-
-
+                <select id="period-select">
+                    <option value="1">Mes actual</option>
+                    <option value="3">Últimos 3 meses</option>
+                    <option value="6">Últimos 6 meses</option>
+                </select>
+                <select id="month-select"></select>
+                <select id="year-select"></select>
+            </div>
         </header>
 
-        <!-- SECCIÓN DE TARJETAS DE MÉTRICAS MEDIAS -->
+        <!-- TARJETAS DE MÉTRICAS MEDIAS -->
         <div class="grid-summary">
-            
-<div class="summary-card">
-    <div class="summary-icon" style="color: #2563eb; background: rgba(37, 99, 235, 0.08);">
-        <i class="fas fa-weight-scale"></i>
-    </div>
-    <div class="summary-info">
-        <h3>Peso Medio Promedio</h3>
-        <p id="kpi-peso-medio">—</p>
-    </div>
-</div>
-
-
+            <div class="summary-card">
+                <div class="summary-icon" style="color: #2563eb; background: rgba(37, 99, 235, 0.08);">
+                    <i class="fas fa-weight-scale"></i>
+                </div>
+                <div class="summary-info">
+                    <h3>Peso Medio</h3>
+                    <p id="kpi-peso-medio">—</p>
+                </div>
+            </div>
 
             <div class="summary-card">
                 <div class="summary-icon" style="color: var(--color-success); background: rgba(16, 185, 129, 0.08);">
                     <i class="fas fa-droplet"></i>
                 </div>
                 <div class="summary-info">
-                    <h3>Glucosa Media Promedio</h3>
+                    <h3>Glucosa Media</h3>
                     <p id="kpi-glucosa-media">—</p>
+                </div>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-icon" style="color: var(--color-bp); background: rgba(139, 92, 246, 0.08);">
+                    <i class="fas fa-heart-pulse"></i>
+                </div>
+                <div class="summary-info">
+                    <h3>Tensión Media</h3>
+                    <p id="kpi-tension-media">—</p>
                 </div>
             </div>
         </div>
 
         <div class="grid-charts">
             <!-- GRÁFICA DE PESO -->
-           <div class="chart-card">
-    <h2><i class="fas fa-weight-scale" style="color: #2563eb;"></i> Evolución del Peso Corporal</h2>
-    <div class="chart-container" id="container-peso">
-        <canvas id="chartPeso"></canvas>
-    </div>
-</div>
+            <div class="chart-card">
+                <h2><i class="fas fa-weight-scale" style="color: #2563eb;"></i> Evolución del Peso Corporal</h2>
+                <div class="chart-container" id="container-peso">
+                    <canvas id="chartPeso"></canvas>
+                </div>
+            </div>
 
             <!-- GRÁFICA DE GLUCOSA -->
             <div class="chart-card">
@@ -268,12 +269,18 @@
                     <canvas id="chartGlucosa"></canvas>
                 </div>
             </div>
+
+            <!-- GRÁFICA DE TENSIÓN ARTERIAL -->
+            <div class="chart-card full-width">
+                <h2><i class="fas fa-heart-pulse" style="color: var(--color-bp);"></i> Evolución de Tensión Arterial (Sistólica / Diastólica mmHg)</h2>
+                <div class="chart-container" id="container-tension">
+                    <canvas id="chartTension"></canvas>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Librería Chart.js mediante CDN estable -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
     <script>
         const rawHistory = JSON.parse(localStorage.getItem('health_history_data')) || {};
         let selectedYear = localStorage.getItem('health_current_year') || new Date().getFullYear();
@@ -283,6 +290,7 @@
         
         let chartPesoInstance = null;
         let chartGlucosaInstance = null;
+        let chartTensionInstance = null;
 
         window.addEventListener('DOMContentLoaded', () => {
             initSelectors();
@@ -321,10 +329,12 @@
             let labels = [];
             let datasetPeso = [];
             let datasetGlucosa = [];
+            let datasetSis = [];
+            let datasetDia = [];
             
-            // Acumuladores analíticos para los promedios numéricos
             let sumPeso = 0, countPeso = 0;
             let sumGlucosa = 0, countGlucosa = 0;
+            let sumSis = 0, sumDia = 0, countTension = 0;
 
             for (let i = periodMonths - 1; i >= 0; i--) {
                 let iterDate = new Date(parseInt(selectedYear), parseInt(selectedMonth) - i, 1);
@@ -348,71 +358,54 @@
                     if (monthData[dayStr]) {
                         const pesoVal = monthData[dayStr].peso !== undefined && monthData[dayStr].peso !== null ? parseFloat(monthData[dayStr].peso) : null;
                         const glucosaVal = monthData[dayStr].glucosa !== undefined && monthData[dayStr].glucosa !== null ? parseInt(monthData[dayStr].glucosa) : null;
+                        const sisVal = monthData[dayStr].tensionSis !== undefined && monthData[dayStr].tensionSis !== null ? parseInt(monthData[dayStr].tensionSis) : null;
+                        const diaVal = monthData[dayStr].tensionDia !== undefined && monthData[dayStr].tensionDia !== null ? parseInt(monthData[dayStr].tensionDia) : null;
                         
                         datasetPeso.push(pesoVal);
                         datasetGlucosa.push(glucosaVal);
+                        datasetSis.push(sisVal);
+                        datasetDia.push(diaVal);
                         
-                        // Computar si el valor es válido y numérico
-                        if (pesoVal !== null && !isNaN(pesoVal)) {
-                            sumPeso += pesoVal;
-                            countPeso++;
-                        }
-                        if (glucosaVal !== null && !isNaN(glucosaVal)) {
-                            sumGlucosa += glucosaVal;
-                            countGlucosa++;
+                        if (pesoVal !== null && !isNaN(pesoVal)) { sumPeso += pesoVal; countPeso++; }
+                        if (glucosaVal !== null && !isNaN(glucosaVal)) { sumGlucosa += glucosaVal; countGlucosa++; }
+                        if (sisVal !== null && !isNaN(sisVal) && diaVal !== null && !isNaN(diaVal)) {
+                            sumSis += sisVal;
+                            sumDia += diaVal;
+                            countTension++;
                         }
                     } else {
                         datasetPeso.push(null);
                         datasetGlucosa.push(null);
+                        datasetSis.push(null);
+                        datasetDia.push(null);
                     }
                 }
             }
 
-            // Actualizar Tarjetas de Información Dinámica (KPIs)
-            const kpiPeso = document.getElementById('kpi-peso-medio');
-            const kpiGlucosa = document.getElementById('kpi-glucosa-media');
-
-            if (countPeso > 0) {
-                kpiPeso.textContent = `${(sumPeso / countPeso).toFixed(2)} kg`;
-            } else {
-                kpiPeso.textContent = '—';
-            }
-
-            if (countGlucosa > 0) {
-                kpiGlucosa.textContent = `${Math.round(sumGlucosa / countGlucosa)} mg/dL`;
-            } else {
-                kpiGlucosa.textContent = '—';
-            }
+            document.getElementById('kpi-peso-medio').textContent = countPeso > 0 ? `${(sumPeso / countPeso).toFixed(2)} kg` : '—';
+            document.getElementById('kpi-glucosa-media').textContent = countGlucosa > 0 ? `${Math.round(sumGlucosa / countGlucosa)} mg/dL` : '—';
+            document.getElementById('kpi-tension-media').textContent = countTension > 0 ? `${Math.round(sumSis / countTension)} / ${Math.round(sumDia / countTension)}` : '—';
 
             const pointRadiusSize = periodMonths === 1 ? 4 : (periodMonths === 3 ? 2 : 1);
 
             renderPesoChart(labels, datasetPeso, countPeso > 0, pointRadiusSize);
             renderGlucosaChart(labels, datasetGlucosa, countGlucosa > 0, pointRadiusSize);
+            renderTensionChart(labels, datasetSis, datasetDia, countTension > 0, pointRadiusSize);
         }
 
         function renderPesoChart(labels, data, hasData, pointRadius) {
             const container = document.getElementById('container-peso');
             if (!hasData) {
-                container.innerHTML = `<div class="no-data-alert"><i class="fas fa-folder-open"></i>No hay registros de peso en el intervalo seleccionado.</div>`;
-                chartPesoInstance = null;
+                container.innerHTML = `<div class="no-data-alert"><i class="fas fa-folder-open"></i>No hay registros de peso.</div>`;
                 return;
             }
-
             container.innerHTML = `<canvas id="chartPeso"></canvas>`;
             const ctx = document.getElementById('chartPeso').getContext('2d');
-            
-            // Filtrado estricto para extraer solo valores numéricos reales (evitando nulls de días vacíos)
-            const vValores = data.filter(v => v !== null && v !== undefined && !isNaN(v));
-            let minCalculated = undefined;
-            let maxCalculated = undefined;
+            const vValores = data.filter(v => v !== null && !isNaN(v));
+            let min = vValores.length ? Math.floor(Math.min(...vValores) - 5) : undefined;
+            let max = vValores.length ? Math.ceil(Math.max(...vValores) + 5) : undefined;
 
-            if (vValores.length > 0) {
-                // Margen de 5 kg por arriba y por abajo para amortiguar visualmente los picos
-                minCalculated = Math.floor(Math.min(...vValores) - 5);
-                maxCalculated = Math.ceil(Math.max(...vValores) + 5);
-            }
-
-            chartPesoInstance = new Chart(ctx, {
+            new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
@@ -424,7 +417,6 @@
                         borderWidth: 2.5,
                         tension: 0.2,
                         spanGaps: true,
-                        pointBackgroundColor: '#2563eb',
                         pointRadius: pointRadius,
                         fill: true
                     }]
@@ -433,22 +425,7 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
-                    scales: {
-                        y: { 
-                            min: minCalculated,
-                            max: maxCalculated,
-                            ticks: { font: { family: 'Plus Jakarta Sans' } }, 
-                            grid: { color: '#f1f5f9' } 
-                        },
-                        x: { 
-                            ticks: { 
-                                font: { family: 'Plus Jakarta Sans', size: 9 },
-                                autoSkip: true,
-                                maxTicksLimit: 20
-                            }, 
-                            grid: { display: false } 
-                        }
-                    }
+                    scales: { y: { min, max, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }
                 }
             });
         }
@@ -456,29 +433,16 @@
         function renderGlucosaChart(labels, data, hasData, pointRadius) {
             const container = document.getElementById('container-glucosa');
             if (!hasData) {
-                container.innerHTML = `<div class="no-data-alert"><i class="fas fa-folder-open"></i>No hay registros de glucosa en el intervalo seleccionado.</div>`;
-                chartGlucosaInstance = null;
+                container.innerHTML = `<div class="no-data-alert"><i class="fas fa-folder-open"></i>No hay registros de glucosa.</div>`;
                 return;
             }
-
             container.innerHTML = `<canvas id="chartGlucosa"></canvas>`;
             const ctx = document.getElementById('chartGlucosa').getContext('2d');
-            
-            // Filtrado estricto para extraer solo valores numéricos reales de glucosa
-            const vValores = data.filter(v => v !== null && v !== undefined && !isNaN(v));
-            let minCalculated = undefined;
-            let maxCalculated = undefined;
+            const vValores = data.filter(v => v !== null && !isNaN(v));
+            let min = vValores.length ? Math.max(0, Math.floor(Math.min(...vValores) - 20)) : undefined;
+            let max = vValores.length ? Math.ceil(Math.max(...vValores) + 20) : undefined;
 
-            if (vValores.length > 0) {
-                // Margen de 20 mg/dL por arriba y por abajo para equilibrar la curva
-                minCalculated = Math.floor(Math.min(...vValores) - 20);
-                maxCalculated = Math.ceil(Math.max(...vValores) + 20);
-                
-                // Evitamos que el límite inferior baje de 0 en el eje de coordenadas
-                if (minCalculated < 0) minCalculated = 0;
-            }
-
-            chartGlucosaInstance = new Chart(ctx, {
+            new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
@@ -490,7 +454,6 @@
                         borderWidth: 2.5,
                         tension: 0.15,
                         spanGaps: true,
-                        pointBackgroundColor: '#10b981',
                         pointRadius: pointRadius,
                         fill: true
                     }]
@@ -499,25 +462,61 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
-                    scales: {
-                        y: {
-                            min: minCalculated,
-                            max: maxCalculated,
-                            ticks: { font: { family: 'Plus Jakarta Sans' } },
-                            grid: { color: '#f1f5f9' }
-                        },
-                        x: {
-                            ticks: { 
-                                font: { family: 'Plus Jakarta Sans', size: 9 },
-                                autoSkip: true,
-                                maxTicksLimit: 20
-                            },
-                            grid: { display: false }
-                        }
-                    }
+                    scales: { y: { min, max, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }
                 }
             });
         }
-</script>
+
+        function renderTensionChart(labels, dataSis, dataDia, hasData, pointRadius) {
+            const container = document.getElementById('container-tension');
+            if (!hasData) {
+                container.innerHTML = `<div class="no-data-alert"><i class="fas fa-folder-open"></i>No hay registros de tensión arterial.</div>`;
+                return;
+            }
+            container.innerHTML = `<canvas id="chartTension"></canvas>`;
+            const ctx = document.getElementById('chartTension').getContext('2d');
+            
+            const allVals = [...dataSis, ...dataDia].filter(v => v !== null && !isNaN(v));
+            let min = allVals.length ? Math.max(0, Math.floor(Math.min(...allVals) - 15)) : undefined;
+            let max = allVals.length ? Math.ceil(Math.max(...allVals) + 15) : undefined;
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Sistólica (mmHg)',
+                            data: dataSis,
+                            borderColor: '#8b5cf6',
+                            backgroundColor: 'rgba(139, 92, 246, 0.04)',
+                            borderWidth: 2.5,
+                            tension: 0.2,
+                            spanGaps: true,
+                            pointRadius: pointRadius,
+                            fill: true
+                        },
+                        {
+                            label: 'Diastólica (mmHg)',
+                            data: dataDia,
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.02)',
+                            borderWidth: 2.5,
+                            tension: 0.2,
+                            spanGaps: true,
+                            pointRadius: pointRadius,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: true, position: 'top' } },
+                    scales: { y: { min, max, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }
+                }
+            });
+        }
+    </script>
 </body>
 </html>

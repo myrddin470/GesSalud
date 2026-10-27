@@ -8,17 +8,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 
-<!-- ICONO EN LA PESTAÑA (Favicon estándar) -->
+<!-- ICONO EN LA PESTAÑA -->
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
 <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-
-<!-- ICONO EN EL ESCRITORIO PARA DISPOSITIVOS iOS (iPhone/iPad) -->
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-
-<!-- VÍNCULO AL MANIFIESTO (Para Android y Escritorio PC/Mac) -->
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#4f46e5"> <!-- Color de la barra de estado en móvil -->
+<meta name="theme-color" content="#4f46e5">
 </head>
 <body>
     <div id="login-container" class="auth-screen hidden">
@@ -56,11 +52,9 @@
                 </div>
                 <button id="btn-next-month" class="btn-nav"><i class="fas fa-chevron-right"></i></button>
 
-                <!-- NUEVO BOTÓN PARA VOLVER AL MES ACTUAL -->
-    <button id="btn-goto-today" class="btn-icon" title="Ir al mes actual">
-        <i class="fas fa-calendar-day"></i></button>
-
-
+                <button id="btn-goto-today" class="btn-icon" title="Ir al mes actual">
+                    <i class="fas fa-calendar-day"></i>
+                </button>
             </div>
 
             <div class="calendar-container">
@@ -77,13 +71,11 @@
             </div>
         </main>
         
-        <!-- BARRA OPERATIVA INFERIOR UNIFICADA CON LEYENDAS COMPLETAS -->
         <footer class="bottom-bar">
             <div class="footer-info">
                 <p>Panel de Control de Salud <strong>©JCOS</strong></p>
             </div>
 
-            <!-- LEYENDA CENTRAL REPARADA (PESO + SEMÁFORO DE GLUCOSA DE 70 A 100) -->
             <div class="footer-legend">
                 <div class="legend-item">
                     <span class="dot dot-weight"></span>
@@ -96,6 +88,10 @@
                 <div class="legend-item">
                     <span class="dot dot-glucose-alert"></span>
                     <span> Glucosa Desajuste (&lt;70 o &gt;100)</span>
+                </div>
+                <div class="legend-item">
+                    <span class="dot dot-bp"></span>
+                    <span> Tensión (mmHg)</span>
                 </div>
             </div>
 
@@ -160,6 +156,26 @@
                         <input type="number" id="glucosa" placeholder="000" class="input-clean">
                     </div>
                 </div>
+
+                <div class="input-group">
+                    <label>Tensión Arterial (Sistólica / Diastólica mmHg)</label>
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                        <div class="input-icon-wrapper" style="flex: 1;">
+                            <i class="fas fa-heart-pulse icon-left" style="color: var(--color-bp);"></i>
+                            <input type="number" id="tension-sis" placeholder="Sist. (ej. 120)" class="input-clean">
+                        </div>
+                        <span style="color: var(--text-muted); font-weight: 700; font-size: 1.1rem;">/</span>
+                        <div class="input-icon-wrapper" style="flex: 1;">
+                            <input type="number" id="tension-dia" placeholder="Diast. (ej. 80)" class="input-clean" style="padding-left: 0.875rem !important;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NUEVO: Campo de comentarios del día -->
+                <div class="input-group">
+                    <label for="comentarios">Comentarios u Observaciones</label>
+                    <textarea id="comentarios" rows="2" placeholder="Notas sobre el día, sensaciones, etc..." class="input-clean" style="resize: none;"></textarea>
+                </div>
             </div>
 
             <div class="modal-footer">
@@ -178,5 +194,4 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="app.js"></script>
 </body>
-
 </html>

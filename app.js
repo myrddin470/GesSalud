@@ -17,29 +17,21 @@ window.addEventListener('pageshow', () => {
     }
 });
 
-
-// Inicialización de Servicios (Corregido: Añadido initializeApp)
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
 
-// Variables de Control Global
 let currentUser = null;
 let currentDate = new Date();
 let selectedDateStr = "";
 let monthData = {};
 const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
 
-// Elementos Estructurales del DOM
 const loginContainer = document.getElementById('login-container');
 const appContainer = document.getElementById('app-container');
 const loginError = document.getElementById('login-error');
 const calendarGrid = document.getElementById('calendar-grid');
 const dayModal = document.getElementById('day-modal');
-
-// =========================================================
-// SISTEMA DE AUTENTICACIÓN Y PERSISTENCIA
-// =========================================================
 
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
     .catch(err => console.error("Error fijando persistencia de sesión:", err));
@@ -47,13 +39,13 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
 auth.onAuthStateChanged((user) => {
     if (user) {
         currentUser = user;
-        loginContainer.classList.add('hidden');    // Como ya nace con 'hidden', aquí no parpadea nada
-        appContainer.classList.remove('hidden');   // Muestra el calendario directamente
+        loginContainer.classList.add('hidden');
+        appContainer.classList.remove('hidden');
         setupControlListeners(); 
         loadMonthDataAndRender();
     } else {
         currentUser = null;
-        loginContainer.classList.remove('hidden'); // Si no estás logueado, le quita el 'hidden' y aparece
+        loginContainer.classList.remove('hidden');
         appContainer.classList.add('hidden');
     }
 });
@@ -79,10 +71,6 @@ document.getElementById('btn-login').addEventListener('click', () => {
 
 document.getElementById('btn-logout').addEventListener('click', () => auth.signOut());
 
-// =========================================================
-// MANEJO Y CONSTRUCCIÓN DEL CALENDARIO MODERNO
-// =========================================================
-
 function setupControlListeners() {
     const monthSelect = document.getElementById('month-select');
     const yearSelect = document.getElementById('year-select');
@@ -107,19 +95,11 @@ function setupControlListeners() {
 }
 
 document.getElementById('btn-goto-today').addEventListener('click', () => {
-    // 1. Reasignamos el objeto global a la fecha de hoy
     currentDate = new Date();
-
-    // 2. Sincronizamos LocalStorage para que todo el ecosistema (y trends.html) se entere
     localStorage.setItem('health_current_month', currentDate.getMonth());
     localStorage.setItem('health_current_year', currentDate.getFullYear());
-
-    // 3. Invocamos tu función de carga
-    // Como tu función ya actualiza los selectores .value internamente, todo cambia a la vez
     loadMonthDataAndRender();
 });
-
-
 
 async function loadMonthDataAndRender() {
     if (!currentUser) return;
@@ -184,27 +164,23 @@ function renderCalendar() {
                 dotsHtml += `<div class="dot dot-weight" title="Peso: ${data.peso} kg"></div>`;
             }
             if (data.glucosa) {
-                // RANGO AJUSTADO: NORMAL DE 70 A 100 mg/dL
                 const esDesajuste = data.glucosa < 70 || data.glucosa > 100;
                 const claseGlucosa = esDesajuste ? 'dot-glucose-alert' : 'dot-glucose';
                 const textoTooltip = esDesajuste ? `¡Desajuste! Glucosa: ${data.glucosa} mg/dL` : `Glucosa normal: ${data.glucosa} mg/dL`;
-                
                 dotsHtml += `<div class="dot ${claseGlucosa}" title="${textoTooltip}"></div>`;
+            }
+            if (data.tensionSis && data.tensionDia) {
+                dotsHtml += `<div class="dot dot-bp" title="Tensión: ${data.tensionSis}/${data.tensionDia} mmHg"></div>`;
             }
             dotsHtml += '</div>';
             innerContent += dotsHtml;
         }
 
         cell.innerHTML = innerContent;
-        
         cell.onclick = () => openModal(day, data, isSunday);
         calendarGrid.appendChild(cell);
     }
 }
-
-// =========================================================
-// LÓGICA DEL CONTROLADOR DEL MODAL INTERACTIVO
-// =========================================================
 
 function openModal(day, data, isSunday) {
     const month = String(currentDate.getMonth() + 1).padStart(2, '0');
@@ -218,17 +194,22 @@ function openModal(day, data, isSunday) {
         document.getElementById('day-type').value = data.tipo || 'laborable';
         document.getElementById('peso').value = data.peso || '';
         document.getElementById('glucosa').value = data.glucosa || '';
+        document.getElementById('tension-sis').value = data.tensionSis || '';
+        document.getElementById('tension-dia').value = data.tensionDia || '';
+        document.getElementById('comentarios').value = data.comentarios || '';
         document.getElementById('btn-delete').classList.remove('hidden');
     } else {
         document.getElementById('day-type').value = isSunday ? 'festivo' : 'laborable';
         document.getElementById('peso').value = '';
         document.getElementById('glucosa').value = '';
+        document.getElementById('tension-sis').value = '';
+        document.getElementById('tension-dia').value = '';
+        document.getElementById('comentarios').value = '';
         document.getElementById('btn-delete').classList.add('hidden');
     }
     
     dayModal.classList.remove('hidden');
 }
-
 
 document.getElementById('btn-save').onclick = async () => {
     if (!selectedDateStr || !currentUser) return;
@@ -237,11 +218,17 @@ document.getElementById('btn-save').onclick = async () => {
     const typeValue = document.getElementById('day-type').value;
     const pesoValue = document.getElementById('peso').value;
     const glucosaValue = document.getElementById('glucosa').value;
+    const sisValue = document.getElementById('tension-sis').value;
+    const diaValue = document.getElementById('tension-dia').value;
+    const comentariosValue = document.getElementById('comentarios').value.trim();
 
     const payload = { tipo: typeValue };
 
     if (pesoValue && !isNaN(pesoValue)) payload.peso = parseFloat(pesoValue);
     if (glucosaValue && !isNaN(glucosaValue)) payload.glucosa = parseInt(glucosaValue, 10);
+    if (sisValue && !isNaN(sisValue)) payload.tensionSis = parseInt(sisValue, 10);
+    if (diaValue && !isNaN(diaValue)) payload.tensionDia = parseInt(diaValue, 10);
+    if (comentariosValue) payload.comentarios = comentariosValue;
 
     try {
         await db.ref(`usuarios/${currentUser.uid}/${year}-${month}/${day}`).set(payload);
@@ -270,10 +257,6 @@ document.getElementById('btn-delete').onclick = async () => {
 document.getElementById('btn-cancel').onclick = () => dayModal.classList.add('hidden');
 document.getElementById('btn-close-modal').onclick = () => dayModal.classList.add('hidden');
 
-// =========================================================
-// GENERACIÓN GENERADOR DE INFORME PDF PROFESIONAL
-// =========================================================
-
 document.getElementById('btn-pdf').onclick = () => {
     if (!currentUser) return;
     const { jsPDF } = window.jspdf;
@@ -285,36 +268,38 @@ document.getElementById('btn-pdf').onclick = () => {
     const monthName = monthNames[monthNum];
     
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(22);
+    doc.setFontSize(20);
     doc.setTextColor(79, 70, 229); 
     doc.text(`INFORME MENSUAL DE SALUD`, 14, 22);
     
-    doc.setFontSize(11);
+    doc.setFontSize(10);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(71, 85, 105);
-    doc.text(`Período de control: ${monthName} de ${year}`, 14, 32);
-    doc.text(`ID de cuenta activa: ${currentUser.email || currentUser.uid}`, 14, 38);
+    doc.text(`Período de control: ${monthName} de ${year}`, 14, 30);
+    
     
     doc.setDrawColor(226, 232, 240);
     doc.setLineWidth(0.5);
-    doc.line(14, 44, 196, 44);
+    doc.line(14, 42, 196, 42);
     
     doc.setFillColor(241, 245, 249);
-    doc.rect(14, 52, 182, 9, "F");
+    doc.rect(14, 48, 182, 8, "F");
     
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(10);
+    doc.setFontSize(9);
     doc.setTextColor(15, 23, 42);
-    doc.text("FECHA", 20, 58);
-    doc.text("PESO CORPORAL", 85, 58);
-    doc.text("NIVEL GLUCOSA", 145, 58);
+    doc.text("FECHA", 18, 53.5);
+    doc.text("PESO", 50, 53.5);
+    doc.text("GLUCOSA", 80, 53.5);
+    doc.text("TENSIÓN", 112, 53.5);
+    doc.text("COMENTARIOS", 145, 53.5);
     
     doc.setDrawColor(203, 213, 225);
-    doc.line(14, 61, 196, 61);
+    doc.line(14, 56, 196, 56);
     
-    let verticalCursor = 69;
+    let verticalCursor = 64;
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(10);
+    doc.setFontSize(8.5);
     doc.setTextColor(51, 65, 85);
     
     const daysInMonth = new Date(year, monthNum + 1, 0).getDate();
@@ -324,21 +309,29 @@ document.getElementById('btn-pdf').onclick = () => {
         const dayStr = String(day).padStart(2, '0');
         const data = monthData[dayStr];
         
-        if (data && (data.peso || data.glucosa)) {
+        if (data && (data.peso || data.glucosa || data.tensionSis || data.comentarios)) {
             recordsPrinted++;
             
             const fullDateText = `${dayStr}/${monthStr}/${year}`;
             const pesoText = data.peso ? `${data.peso.toFixed(1)} kg` : "---";
             const glucosaText = data.glucosa ? `${data.glucosa} mg/dL` : "---";
+            const tensionText = (data.tensionSis && data.tensionDia) ? `${data.tensionSis}/${data.tensionDia}` : "---";
+            const comentariosText = data.comentarios || "---";
             
-            doc.text(fullDateText, 20, verticalCursor);
-            doc.text(pesoText, 85, verticalCursor);
-            doc.text(glucosaText, 145, verticalCursor);
+            doc.text(fullDateText, 18, verticalCursor);
+            doc.text(pesoText, 50, verticalCursor);
+            doc.text(glucosaText, 80, verticalCursor);
+            doc.text(tensionText, 112, verticalCursor);
             
+            // Truncar comentarios largos para que no rompan el PDF
+            const splitComentarios = doc.splitTextToSize(comentariosText, 50);
+            doc.text(splitComentarios, 145, verticalCursor);
+            
+            const rowHeight = Math.max(8, splitComentarios.length * 5);
             doc.setDrawColor(241, 245, 249);
             doc.line(14, verticalCursor + 3, 196, verticalCursor + 3);
             
-            verticalCursor += 9;
+            verticalCursor += rowHeight + 2;
             
             if (verticalCursor > 265) {
                 doc.addPage();
@@ -361,10 +354,6 @@ document.getElementById('btn-pdf').onclick = () => {
     doc.save(`informe_salud_${year}_${monthStr}.pdf`);
 };
 
-// =========================================================
-// ACCESO A LA PÁGINA DE TENDENCIAS Y GRÁFICOS
-// =========================================================
-
 document.getElementById('btn-trends').onclick = async () => {
     if (!currentUser) return;
     
@@ -381,7 +370,6 @@ document.getElementById('btn-trends').onclick = async () => {
         localStorage.setItem('health_current_month', currentDate.getMonth());
 
         window.location.href = 'trends.html';
-
     } catch (err) {
         alert("Error al recopilar el histórico para las tendencias.");
         console.error(err);
@@ -389,10 +377,6 @@ document.getElementById('btn-trends').onclick = async () => {
         btn.innerHTML = originalContent;
     }
 };
-
-// =========================================================
-// PROCESAMIENTO DE ARCHIVOS (BACKUPS JSON)
-// =========================================================
 
 document.getElementById('btn-export').onclick = async () => {
     if (!currentUser) return;
